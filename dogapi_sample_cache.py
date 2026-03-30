@@ -7,6 +7,7 @@ both `new/solution.py` and `new/startercode.py`.
 
 # Real Dog API v2 group ids (these are UUID strings returned/used by the API)
 import json
+from linecache import cache
 
 
 GROUP_ID_HOUND = 'be0147df-7755-4228-b132-2518c0c6d10d'  # e.g., the group used by Breed A/B
@@ -120,3 +121,21 @@ def load_json(filename):
         return {}
     
 def create_cache(dictionary, filename):
+    with open(filename, 'w') as f:
+        json.dump(dictionary, f)
+
+def search_breed(breed_id):
+    url = f'https://dogapi.dog/api/v2/breeds/{breed_id}'
+    cache = load_json('cache.json')
+    try:
+        response = requests.get(url)
+        if response.status_code == 200 and response.json().get('data') is not None:
+            cache[url] = response.json()
+            cache[url]['status_code'] = response.status_code
+            create_cache(cache, 'cache.json')
+            return (response.json(), url)
+        else:
+            cache[url] = {'status_code': response.status_code, 'data': None}
+            create_cache(cache, 'cache.json')
+            return None
+       
