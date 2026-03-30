@@ -6,6 +6,9 @@ both `new/solution.py` and `new/startercode.py`.
 """
 
 # Real Dog API v2 group ids (these are UUID strings returned/used by the API)
+import json
+
+
 GROUP_ID_HOUND = 'be0147df-7755-4228-b132-2518c0c6d10d'  # e.g., the group used by Breed A/B
 GROUP_ID_TOY = 'f56dc4b1-ba1a-4454-8ce2-bd5d41404a0c'  # e.g., the group used by Breed C
 GROUP_ID_HERDING = 'b8e4e89d-057f-432a-9e58-0b85b29b693c'  # e.g., the group used by Breed D
@@ -109,3 +112,11 @@ SAMPLE_CACHE = {
     }
 }
 
+def load_json(filename):
+    try:
+        with open(filename, 'r') as f:
+            return json.load(f)
+    except (FileNotFoundError, json.JSONDecodeError):
+        return {}
+    
+def create_cache(dictionary, filename):
