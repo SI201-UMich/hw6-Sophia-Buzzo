@@ -8,6 +8,7 @@ both `new/solution.py` and `new/startercode.py`.
 # Real Dog API v2 group ids (these are UUID strings returned/used by the API)
 import json
 from linecache import cache
+import requests
 
 
 GROUP_ID_HOUND = 'be0147df-7755-4228-b132-2518c0c6d10d'  # e.g., the group used by Breed A/B
@@ -138,4 +139,31 @@ def search_breed(breed_id):
             cache[url] = {'status_code': response.status_code, 'data': None}
             create_cache(cache, 'cache.json')
             return None
+    except requests.exceptions. RequestsException:
+        return None
+    
+def update_cache(breed_ids, cache_file):
+    cache = load_json(cache_file)
+    successful_caches = 0
+    total_breeds = len(breed_ids)
+
+    for breed in breed_ids:
+        url = f'https://dogapi.dog/api/v2/breeds/{breed}'
+        
+        if url in cache and cache[url].get('status_code') == 200 and cache[url].get('data') is not None:
+            continue
        
+        try:
+            response = requests.get(url)
+            if response.status_code == 200 and response.json().get('data') is not None:
+                cache[url] = response.json()
+                cache[url]['status_code'] = response.status_code
+                successful_caches += 1
+        except requests.exceptions.RequestException:
+            pass
+    create_cache(cache, cache_file)
+    if total_breeds > 0:
+        percentage = (successful_caches / total_breeds) * 100
+    else:
+        percentage = 0
+    return f"Cached data for {percentage:.2f}% of breeds."
