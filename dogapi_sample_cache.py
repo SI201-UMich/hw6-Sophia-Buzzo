@@ -167,3 +167,28 @@ def update_cache(breed_ids, cache_file):
     else:
         percentage = 0
     return f"Cached data for {percentage:.2f}% of breeds."
+
+def get_longest_breed(cache_file):
+    cache = load_json(cache_file)
+    longest_breed = None
+    longest_life = 0
+
+    for url, data in cache.items():
+        if data.get('status_code') == 200 and data.get('data') is not None:
+            breed_data = data['data']
+            life_info = breed_data['attributes'].get('life', {})
+            max_life = life_info.get('max')
+            breed_name = breed_data['attributes']['name']
+
+            if max_life is not None:
+                if max_life > longest_life:
+                    longest_life = max_life
+                    longest_breed = (breed_name, max_life)
+                elif max_life == longest_life and longest_breed is not None:
+                    if breed_name < longest_breed[0]:
+                        longest_breed = (breed_name, max_life)
+            
+    if longest_breed:
+        return longest_breed
+    else:
+        return "No breeds found"
