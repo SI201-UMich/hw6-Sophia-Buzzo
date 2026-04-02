@@ -192,3 +192,28 @@ def get_longest_breed(cache_file):
         return longest_breed
     else:
         return "No breeds found"
+    
+def get_groups_above_cutoff(cutoff, cache_file):
+    cache = load_json(cache_file)
+    groups = {}
+    group_counts = {}
+
+    
+
+    for url, data in cache.items():
+        if data.get('status_code') == 200 and data.get('data') is not None:
+            breed_data = data['data']
+            life_info = breed_data['attributes'].get('life', {})
+            max_life = life_info.get('max')
+
+            if max_life is not None and max_life >= cutoff:
+                if ('relationships' in breed_data and 
+                    'group' in breed_data['relationships'] and 
+                    'data' in breed_data['relationships']['group'] and 
+                    'id' in breed_data['relationships']['group']['data']):
+                    group_id = breed_data['relationships']['group']['data']['id']
+                    if group_id not in groups:
+                        groups[group_id] = 0
+                    group_counts[group_id] += 1
+
+    return list(groups)
