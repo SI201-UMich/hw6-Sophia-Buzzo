@@ -1,18 +1,19 @@
 # SI 201 HW6 (APIs, JSON, and Caching)
-# Your name:
-# Your student id:
-# Your email:
+# Your name: Sophia Buzzo
+# Your student id: 4140 3841
+# Your email: sbuzo@umich.edu
 # Who or what you worked with on this homework (including generative AI like ChatGPT):
 # If you worked with generative AI also add a statement for how you used it.
 # e.g.:
 # Asked ChatGPT for help debugging and understanding the JSON structure
-#
-# Did your use of GenAI on this assignment align with your goals and guidelines in your Gen AI contract? If not, why?
+#I used the GenAI chatbox for hints on understanding any erros and debugging my code.
+#I did not use it to generate code for me.
 #
 # --- ARGUMENTS & EXPECTED RETURN VALUES PROVIDED --- #
 # --- SEE INSTRUCTIONS FOR FULL DETAILS ON METHOD IMPLEMENTATION --- #
 
 from fileinput import filename
+from functools import cache
 
 import requests
 import json
@@ -232,7 +233,7 @@ def recommend_breeds_in_same_group(breed_name, cache_file):
             "No recommendations found based on '{breed_name}'."  (no other breeds in that group)
     """
     def recommend_breeds_in_same_group(breed_name, cache_file):
-    cache = load_json(cache_file)
+        cache = load_json(cache_file)
     target_group_id = None
     recommendations = []
     breed_found = False
