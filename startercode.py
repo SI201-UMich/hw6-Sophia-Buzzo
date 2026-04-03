@@ -12,6 +12,8 @@
 # --- ARGUMENTS & EXPECTED RETURN VALUES PROVIDED --- #
 # --- SEE INSTRUCTIONS FOR FULL DETAILS ON METHOD IMPLEMENTATION --- #
 
+from fileinput import filename
+
 import requests
 import json
 import unittest
@@ -36,7 +38,12 @@ def load_json(filename):
         A dictionary with the JSON data, OR an empty dictionary {} if the file
         cannot be opened or is not valid JSON.
     """
-    pass
+    try:
+        with open(filename, 'r') as f:
+            return json.load(f)
+    except (FileNotFoundError, json.JSONDecodeError):
+        return {}
+    
 
 
 def create_cache(dictionary, filename):
@@ -51,7 +58,8 @@ def create_cache(dictionary, filename):
     RETURNS:
         None
     """
-    pass
+    with open(filename, 'w') as f:
+        json.dump(dictionary, f)
 
 
 def search_breed(breed_id):
