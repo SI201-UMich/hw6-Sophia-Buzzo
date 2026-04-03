@@ -139,7 +139,7 @@ def search_breed(breed_id):
             cache[url] = {'status_code': response.status_code, 'data': None}
             create_cache(cache, 'cache.json')
             return None
-    except requests.exceptions. RequestsException:
+    except requests.exceptions.RequestException:
         return None
     
 def update_cache(breed_ids, cache_file):
@@ -212,11 +212,9 @@ def get_groups_above_cutoff(cutoff, cache_file):
                     'data' in breed_data['relationships']['group'] and 
                     'id' in breed_data['relationships']['group']['data']):
                     group_id = breed_data['relationships']['group']['data']['id']
-                    if group_id not in groups:
-                        groups[group_id] = 0
-                    group_counts[group_id] += 1
-
-    return list(groups)
+                    group_counts[group_id] = group_counts.get(group_id, 0) + 1
+    filtered_groups = {group_id: count for group_id, count in group_counts.items() if count >= cutoff}
+    return filtered_groups
 
 #Extra Credit
 def recommend_breeds_in_same_group(breed_name, cache_file):
