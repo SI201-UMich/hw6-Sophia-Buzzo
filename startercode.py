@@ -231,6 +231,48 @@ def recommend_breeds_in_same_group(breed_name, cache_file):
             "No group information available for '{breed_name}'."  (no group id)
             "No recommendations found based on '{breed_name}'."  (no other breeds in that group)
     """
+    def recommend_breeds_in_same_group(breed_name, cache_file):
+    cache = load_json(cache_file)
+    target_group_id = None
+    recommendations = []
+    breed_found = False
+
+    if not cache:
+        return "No breed data found in cache."
+
+    for url, data in cache.items():
+        if data.get('status_code') == 200 and data.get('data') is not None:
+            breed_data = data['data']
+            if breed_data['attributes']['name'] == breed_name:
+                breed_found = True
+                if ('relationships' in breed_data and 
+                    'group' in breed_data['relationships'] and 
+                    'data' in breed_data['relationships']['group'] and 
+                    'id' in breed_data['relationships']['group']['data']):
+                    target_group_id = breed_data['relationships']['group']['data']['id']
+                break
+
+    if not breed_found:
+        return f"'{breed_name}' is not in the cache."
+    if target_group_id is None:
+        return f" No group information available for '{breed_name}'."
+
+    for url, data in cache.items():
+        if data.get('status_code') == 200 and data.get('data') is not None:
+            breed_data = data['data']
+            if ('relationships' in breed_data and 
+                'group' in breed_data['relationships'] and 
+                'data' in breed_data['relationships']['group'] and 
+                'id' in breed_data['relationships']['group']['data'] and 
+                breed_data['relationships']['group']['data']['id'] == target_group_id):
+                recommendations.append(breed_data['attributes']['name'])
+
+    recommendations.remove(breed_name)
+    if not recommendations:
+        return f"No recommendations found based on '{breed_name}'."
+    
+    return recommendations
+
 
 
 class TestHomeworkDogAPI(unittest.TestCase):
