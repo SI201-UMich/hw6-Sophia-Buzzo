@@ -187,7 +187,27 @@ def get_groups_above_cutoff(cutoff, cache_file):
     RETURNS:
         A dictionary {group_uuid: count} for groups with count >= cutoff only.
     """
-    pass
+    cache = load_json(cache_file)
+    groups = {}
+    group_counts = {}
+
+    
+
+    for url, data in cache.items():
+        if data.get('status_code') == 200 and data.get('data') is not None:
+            breed_data = data['data']
+            life_info = breed_data['attributes'].get('life', {})
+            max_life = life_info.get('max')
+
+            if max_life is not None and max_life >= cutoff:
+                if ('relationships' in breed_data and 
+                    'group' in breed_data['relationships'] and 
+                    'data' in breed_data['relationships']['group'] and 
+                    'id' in breed_data['relationships']['group']['data']):
+                    group_id = breed_data['relationships']['group']['data']['id']
+                    group_counts[group_id] = group_counts.get(group_id, 0) + 1
+    filtered_groups = {group_id: count for group_id, count in group_counts.items() if count >= cutoff}
+    return filtered_groups
 
 
 # Extra Credit
